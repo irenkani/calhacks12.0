@@ -11,7 +11,7 @@ import json
 import re
 
 # Configure Gemini
-genai.configure(api_key="YOUR_GEMINI_API_KEY")
+genai.configure(api_key="AIzaSyA-k-w28qfWo6IhoDa2uABSGzlwrM2L3Po")
 model = genai.GenerativeModel('gemini-2.0-flash-exp')
 
 # Create agent
