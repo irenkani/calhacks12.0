@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Analysis</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        .header { margin-bottom: 30px; }
+        .header h1 { color: #333; margin-bottom: 10px; }
+        .header p { color: #666; font-size: 18px; }
+        .analyze-btn { 
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white; 
+            padding: 20px 40px; 
+            border: none; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            font-size: 20px;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .analyze-btn:hover { 
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .analyze-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .loading { 
+            text-align: center; 
+            padding: 20px; 
+            color: #666;
+        }
+        .loading h3 { color: #333; }
+        .results { 
+            margin-top: 30px; 
+            padding: 20px; 
+            background: #f8f9fa; 
+            border-radius: 15px; 
+            text-align: left;
+        }
+        .metric { 
+            background: white; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 10px; 
+            border-left: 4px solid #007bff;
+        }
+        .metric h3 { margin: 0 0 10px 0; color: #333; }
+        .metric p { margin: 5px 0; color: #666; }
+        .recommendation { 
+            background: #fff3cd; 
+            border: 1px solid #ffeaa7; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 10px; 
+            border-left: 4px solid #ffc107;
+        }
+        .error { 
+            background: #f8d7da; 
+            border: 1px solid #f5c6cb; 
+            color: #721c24; 
+            padding: 15px; 
+            border-radius: 10px; 
+            margin-top: 20px;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Patient Analysis</h1>
+            <p>Get comprehensive nutrition and eating pattern analysis</p>
+        </div>
+
+        <button id="analyzeBtn" class="analyze-btn" onclick="analyzePatient()">
+            📊 Tell me about this patient
+        </button>
+
+        <div id="loading" class="loading hidden">
+            <h3>⏳ Analyzing patient data...</h3>
+            <p>Processing meal images and generating insights...</p>
+        </div>
+
+        <div id="results" class="results hidden">
+            <h2>📈 Analysis Results</h2>
+            <div id="resultsContent"></div>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+    </div>
+
+    <script>
+        async function analyzePatient() {
+            const btn = document.getElementById('analyzeBtn');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const error = document.getElementById('error');
+            
+            // Show loading, hide others
+            btn.disabled = true;
+            btn.textContent = '⏳ Analyzing...';
+            loading.classList.remove('hidden');
+            results.classList.add('hidden');
+            error.classList.add('hidden');
+            
+            try {
+                const response = await fetch('/analyze_patient', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({})
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayResults(result.analysis);
+                } else {
+                    showError(result.error);
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📊 Tell me about this patient';
+                loading.classList.add('hidden');
+            }
+        }
+        
+        function displayResults(analysis) {
+            const resultsContent = document.getElementById('resultsContent');
+            
+            resultsContent.innerHTML = `
+                <div class="metric">
+                    <h3>📸 Images Analyzed</h3>
+                    <p><strong>${analysis.total_images_analyzed}</strong> meal images processed</p>
+                </div>
+                
+                <div class="metric">
+                    <h3>⏰ Eating Patterns</h3>
+                    <p><strong>Total Meals:</strong> ${analysis.eating_patterns.total_meals}</p>
+                    <p><strong>Average Interval:</strong> ${analysis.eating_patterns.avg_interval_hours} hours between meals</p>
+                    <p><strong>Regular Eating:</strong> ${analysis.eating_patterns.regular_eating ? '✅ Yes - Good routine' : '❌ No - Irregular pattern'}</p>
+                    <p><strong>Average Consumption:</strong> ${analysis.eating_patterns.avg_consumption_percent}% per meal</p>
+                </div>
+                
+                <div class="metric">
+                    <h3>🍎 Nutritional Summary</h3>
+                    <p><strong>Total Calories:</strong> ${analysis.nutritional_summary.total_calories}</p>
+                    <p><strong>Average per Meal:</strong> ${analysis.nutritional_summary.avg_calories_per_meal} calories</p>
+                    <p><strong>Most Common Foods:</strong> ${analysis.nutritional_summary.most_common_foods.join(', ')}</p>
+                </div>
+                
+                <div class="metric">
+                    <h3>🎯 Analysis Confidence</h3>
+                    <p><strong>${Math.round(analysis.confidence_score * 100)}%</strong> confidence in results</p>
+                </div>
+                
+                <h3>💡 Professional Recommendations</h3>
+                ${analysis.recommendations.map(rec => `<div class="recommendation">${rec}</div>`).join('')}
+                
+                <p style="text-align: center; margin-top: 20px; color: #999; font-size: 14px;">
+                    Analysis completed: ${new Date(analysis.analysis_timestamp * 1000).toLocaleString()}
+                </p>
+            `;
+            
+            document.getElementById('results').classList.remove('hidden');
+        }
+        
+        function showError(message) {
+            document.getElementById('error').textContent = message;
+            document.getElementById('error').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

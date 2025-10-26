@@ -1,0 +1,8 @@
+uagents>=0.12.0
+supabase>=2.0.0
+google-generativeai
+Pillow
+requests
+python-dotenv
+pydantic
+Flask

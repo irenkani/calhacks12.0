@@ -1,0 +1,44 @@
+[
+  {
+    "filename": "pic1.png",
+    "url": "https://gbkpvgpobtmcutbzqqdm.supabase.co/storage/v1/object/public/meals/assets_batch_1761474313/frame_1761474313_1761474313.jpg",
+    "session_id": "assets_batch_1761474313",
+    "frame_id": "frame_1761474313",
+    "uploaded_at": 1761474316
+  },
+  {
+    "filename": "pic3.png",
+    "url": "https://gbkpvgpobtmcutbzqqdm.supabase.co/storage/v1/object/public/meals/assets_batch_1761474313/frame_1761474346_1761474346.jpg",
+    "session_id": "assets_batch_1761474313",
+    "frame_id": "frame_1761474346",
+    "uploaded_at": 1761474347
+  },
+  {
+    "filename": "pic2.png",
+    "url": "https://gbkpvgpobtmcutbzqqdm.supabase.co/storage/v1/object/public/meals/assets_batch_1761474313/frame_1761474377_1761474377.jpg",
+    "session_id": "assets_batch_1761474313",
+    "frame_id": "frame_1761474377",
+    "uploaded_at": 1761474378
+  },
+  {
+    "filename": "pic6.png",
+    "url": "https://gbkpvgpobtmcutbzqqdm.supabase.co/storage/v1/object/public/meals/assets_batch_1761474313/frame_1761474408_1761474408.jpg",
+    "session_id": "assets_batch_1761474313",
+    "frame_id": "frame_1761474408",
+    "uploaded_at": 1761474410
+  },
+  {
+    "filename": "pic5.png",
+    "url": "https://gbkpvgpobtmcutbzqqdm.supabase.co/storage/v1/object/public/meals/assets_batch_1761474313/frame_1761474440_1761474440.jpg",
+    "session_id": "assets_batch_1761474313",
+    "frame_id": "frame_1761474440",
+    "uploaded_at": 1761474442
+  },
+  {
+    "filename": "pic4.png",
+    "url": "https://gbkpvgpobtmcutbzqqdm.supabase.co/storage/v1/object/public/meals/assets_batch_1761474313/frame_1761474472_1761474472.jpg",
+    "session_id": "assets_batch_1761474313",
+    "frame_id": "frame_1761474472",
+    "uploaded_at": 1761474474
+  }
+]

@@ -33,6 +33,9 @@ export class SpectaclesController extends BaseScriptComponent {
     @optional
     dogAnimator: AnimationMixer;
     
+    @input
+    fetchAIAgent: FetchAIAgent;
+    
     // ==========================================
     // CONFIGURATION
     // ==========================================
@@ -133,32 +136,18 @@ export class SpectaclesController extends BaseScriptComponent {
                 return;
             }
             
-            // 3. Convert RGB image to base64
-            const imageBase64 = this.textureToBase64(cameraTexture);
-            
-            // 4. Extract depth data from the cached frame
-            const depthData = this.extractDepthData(depthFrameID);
-            
-            // 5. Build payload
-            const payload = {
-                session_id: this.sessionId,
-                user_id: this.userId,
-                image_base64: imageBase64,
-                depth_cache: {
-                    width: depthData.width,
-                    height: depthData.height,
-                    depth_values: depthData.values
-                },
-                timestamp: Date.now()
-            };
-            
-            print(`📦 Payload prepared - Image: ${imageBase64.length} chars, Depth: ${depthData.values.length} samples`);
-            
-            // 6. Send to agent
-            this.sendToAgent(payload);
-            
-            // 7. Clean up the cached frame after sending
-            this.depthCache.disposeDepthFrame(depthFrameID);
+            // 3. Use FetchAIAgent for analysis
+            this.fetchAIAgent.sendMealCapture(
+                cameraTexture,
+                depthFrameID,
+                this.sessionId,
+                this.userId,
+                (analysisResult) => {
+                    print(`✅ Received analysis result: ${JSON.stringify(analysisResult)}`);
+                    this.updateUIFromAnalysis(analysisResult);
+                    this.depthCache.disposeDepthFrame(depthFrameID);
+                }
+            );
             
         } catch (error) {
             print("❌ Capture error: " + error);
@@ -392,6 +381,38 @@ export class SpectaclesController extends BaseScriptComponent {
     // ==========================================
     // UI UPDATE
     // ==========================================
+    
+    private updateUIFromAnalysis(result: any): void {
+        // Convert AnalysisResult to UI state (no DogState from backend)
+        const progress = result.consumed_since_last * 4; // Scale to percentage
+        
+        // Calculate dog state locally
+        let dogState = "resting";
+        if (progress >= 80) dogState = "excited";
+        else if (progress >= 60) dogState = "playing";
+        else if (progress >= 40) dogState = "walking";
+        
+        this.dogHappiness = Math.min(10, Math.max(1, Math.floor(progress / 10)));
+        this.dogActivity = Math.min(10, Math.max(1, Math.floor(progress / 12)));
+        this.dogVisualState = dogState;
+        
+        print(`🎨 Updating UI from analysis - Progress: ${progress}%, State: ${dogState}`);
+        
+        // Update dog texture
+        this.updateDogTexture(dogState);
+        
+        // Update message based on analysis
+        const foodNames = result.food_items.map((f: any) => f.name).join(", ");
+        this.messageText.text = `Found: ${foodNames}. Progress: ${progress.toFixed(1)}%`;
+        
+        // Update progress bar
+        this.updateProgressBar(progress);
+        
+        // Celebration for high progress
+        if (progress >= 80) {
+            this.triggerCelebration();
+        }
+    }
     
     private updateUI(result: any): void {
         this.dogHappiness = result.happiness;
