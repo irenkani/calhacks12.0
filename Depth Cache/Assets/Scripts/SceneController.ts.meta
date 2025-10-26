@@ -26,12 +26,20 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
+    boundaryPrefab: false
     debugVisualizer: false
+    defaultBoundaryRadius: false
     depthCache: false
     gemini: false
+    highFoodSprite: false
     loading: false
+    lowFoodSprite: false
+    mediumFoodSprite: false
     responseUI: false
+    scoringEngine: false
+    showBoundaryVisuals: false
     showDebugVisuals: false
+    veryLowFoodSprite: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -47,6 +55,14 @@
       responseUI: !<MappingBased.AssignableType_2> 00000000-0000-0000-0000-000000000000
       loading: !<MappingBased.AssignableType_3> 00000000-0000-0000-0000-000000000000
       depthCache: !<MappingBased.AssignableType_4> 00000000-0000-0000-0000-000000000000
+      scoringEngine: !<MappingBased.AssignableType_5> 00000000-0000-0000-0000-000000000000
+      highFoodSprite: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      mediumFoodSprite: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      lowFoodSprite: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      veryLowFoodSprite: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      boundaryPrefab: !<MappingBased.AssignableType_6> 00000000-0000-0000-0000-000000000000
+      defaultBoundaryRadius: 0.500000
+      showBoundaryVisuals: true
   ScriptTypes:
     -
       {}
@@ -57,3 +73,11 @@
     - '// @input AssignableType_2 responseUI {"hint":"Displays AI speech output"}'
     - '// @input AssignableType_3 loading {"hint":"Loading visual"}'
     - '// @input AssignableType_4 depthCache {"hint":"Caches depth frame and converts pixel positions to world space"}'
+    - '// @input AssignableType_5 scoringEngine {"hint":"Scoring engine for eating pace evaluation"}'
+    - '// @input Component.Text highFoodSprite {"hint":"Sprite for high food level (>80%)"}'
+    - '// @input Component.Text mediumFoodSprite {"hint":"Sprite for medium food level (60-80%)"}'
+    - '// @input Component.Text lowFoodSprite {"hint":"Sprite for low food level (30-60%)"}'
+    - '// @input Component.Text veryLowFoodSprite {"hint":"Sprite for very low food level (<30%)"}'
+    - '// @input AssignableType_6 boundaryPrefab {"hint":"Prefab for boundary visualization (circle/sphere)"}'
+    - '// @input float defaultBoundaryRadius = 0.5 {"hint":"Default boundary radius for food objects"}'
+    - '// @input bool showBoundaryVisuals = true {"hint":"Show boundary visualizations"}'

@@ -9,6 +9,7 @@ from PIL import Image
 import io
 import json
 import re
+import time
 
 # Configure Gemini
 genai.configure(api_key="AIzaSyA-k-w28qfWo6IhoDa2uABSGzlwrM2L3Po")
@@ -49,6 +50,20 @@ class AnalysisResult(BaseModel):
     estimated_calories: int
     confidence: float
 
+class ScoringData(BaseModel):
+    """Scoring system data"""
+    total_score: float
+    grade: str
+    session_duration: float
+    food_consumed: float
+    average_rate: float
+    consistency: float
+    streak_count: int
+    interval_count: int
+    ideal_rate_count: int
+    pace_status: str
+    recommendation: str
+
 class DogState(BaseModel):
     """Response to Snap Spectacles"""
     happiness: int = Field(ge=1, le=10)
@@ -57,9 +72,117 @@ class DogState(BaseModel):
     message: str
     progress: float
     celebration: bool = False
+    scoring_data: Optional[ScoringData] = None
 
 # Session storage
 sessions = {}
+
+# Simple scoring system implementation
+def calculate_eating_score(session_data: dict) -> ScoringData:
+    """Calculate eating pace score based on session data"""
+    captures = session_data.get('captures', 0)
+    total_consumed = session_data.get('total_consumed', 0)
+    start_time = session_data.get('start_time', 0)
+    current_time = int(time.time() * 1000)  # Current timestamp in milliseconds
+    
+    if captures < 2:
+        # Not enough data for scoring
+        return ScoringData(
+            total_score=0.0,
+            grade="N/A",
+            session_duration=0.0,
+            food_consumed=total_consumed,
+            average_rate=0.0,
+            consistency=0.0,
+            streak_count=0,
+            interval_count=0,
+            ideal_rate_count=0,
+            pace_status="insufficient_data",
+            recommendation="Keep eating to get a score!"
+        )
+    
+    # Calculate session duration in seconds
+    session_duration = (current_time - start_time) / 1000.0
+    
+    # Calculate average consumption rate
+    average_rate = total_consumed / session_duration if session_duration > 0 else 0
+    
+    # Ideal rate is 0.5% per second (30% per minute)
+    ideal_rate = 0.5
+    tolerance = 0.2
+    
+    # Calculate score based on how close to ideal rate
+    deviation = abs(average_rate - ideal_rate)
+    if deviation <= tolerance:
+        base_score = 100
+        pace_status = "ideal"
+        recommendation = "Perfect pace! Keep it up!"
+    elif deviation <= tolerance + 0.3:
+        base_score = 80
+        pace_status = "good"
+        recommendation = "Great pace! You're doing well!"
+    elif deviation <= tolerance + 0.6:
+        base_score = 60
+        pace_status = "fair"
+        recommendation = "Try to maintain a steady pace"
+    else:
+        base_score = 40
+        pace_status = "needs_improvement"
+        recommendation = "Consider slowing down and savoring each bite"
+    
+    # Apply duration multiplier
+    if session_duration < 60:  # Less than 1 minute
+        duration_multiplier = 0.8
+    elif session_duration > 1800:  # More than 30 minutes
+        duration_multiplier = 1.2
+    else:
+        duration_multiplier = 1.0
+    
+    total_score = base_score * duration_multiplier
+    
+    # Calculate grade
+    if total_score >= 95:
+        grade = "A+"
+    elif total_score >= 90:
+        grade = "A"
+    elif total_score >= 85:
+        grade = "A-"
+    elif total_score >= 80:
+        grade = "B+"
+    elif total_score >= 75:
+        grade = "B"
+    elif total_score >= 70:
+        grade = "B-"
+    elif total_score >= 65:
+        grade = "C+"
+    elif total_score >= 60:
+        grade = "C"
+    elif total_score >= 55:
+        grade = "C-"
+    elif total_score >= 50:
+        grade = "D"
+    else:
+        grade = "F"
+    
+    # Calculate consistency (simplified)
+    consistency = max(0, 1 - (deviation / (ideal_rate * 2)))
+    
+    # Estimate streaks (simplified - assume good consistency = streaks)
+    streak_count = 1 if consistency > 0.7 else 0
+    
+    return ScoringData(
+        total_score=total_score,
+        grade=grade,
+        session_duration=session_duration,
+        food_consumed=total_consumed,
+        average_rate=average_rate,
+        consistency=consistency,
+        streak_count=streak_count,
+        interval_count=captures - 1,  # Intervals = captures - 1
+        ideal_rate_count=1 if deviation <= tolerance else 0,
+        pace_status=pace_status,
+        recommendation=recommendation
+    )
 
 # === HTTP Protocol for Snap Lens Studio ===
 http_protocol = Protocol(name="SpectaclesProtocol")
@@ -93,14 +216,18 @@ async def handle_capture(ctx: Context, sender: str, msg: CaptureRequest):
         # 4. Generate encouragement message
         message = generate_message(progress, analysis.food_items)
         
-        # 5. Create response
+        # 5. Calculate scoring data
+        scoring_data = calculate_eating_score(session)
+        
+        # 6. Create response
         response = DogState(
             happiness=dog_state['happiness'],
             activity=dog_state['activity'],
             visual_state=dog_state['visual'],
             message=message,
             progress=progress,
-            celebration=(progress >= 80 and session['captures'] > 3)
+            celebration=(progress >= 80 and session['captures'] > 3),
+            scoring_data=scoring_data
         )
         
         ctx.logger.info(f"✅ Sending response - Progress: {progress}%, Happiness: {response.happiness}")
@@ -267,13 +394,17 @@ async def rest_analyze(ctx: Context, req: CaptureRequest) -> DogState:
     dog_state = calculate_dog_state(progress, analysis.consumed_since_last)
     message = generate_message(progress, analysis.food_items)
     
+    # Calculate scoring data
+    scoring_data = calculate_eating_score(session)
+    
     return DogState(
         happiness=dog_state['happiness'],
         activity=dog_state['activity'],
         visual_state=dog_state['visual'],
         message=message,
         progress=progress,
-        celebration=(progress >= 80)
+        celebration=(progress >= 80),
+        scoring_data=scoring_data
     )
 
 # === Session Management Endpoints ===
