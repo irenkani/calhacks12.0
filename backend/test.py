@@ -10,8 +10,13 @@ import io
 import json
 import re
 
+
+from dotenv import load_dotenv
+load_dotenv()
+
+SECRET_KEY = os.getenv("GEMINI_API_KEY")
 # Configure Gemini
-genai.configure(api_key="AIzaSyA-k-w28qfWo6IhoDa2uABSGzlwrM2L3Po")
+genai.configure(api_key=SECRET_KEY)
 model = genai.GenerativeModel('gemini-2.0-flash-exp')
 
 # Create agent
