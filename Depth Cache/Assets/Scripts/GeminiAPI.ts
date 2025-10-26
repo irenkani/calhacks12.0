@@ -13,6 +13,7 @@ const SYSTEM_MESSAGE =
   //Warnings
   "Return bounding boxes as a JSON array with labels. Never return masks or code fencing. Limit to 25 objects.\n" +
   "If an object is present multiple times, name them according to their unique characteristic (colors, size, position, unique characteristics, etc..). \n" +
+  "Also, return bounding boxes only if they are food items. Do not return bounding boxes for non-food items.\n" +  
   //Context Dump
   "The label and arrow can be useful for tasks, if user asks how to use something, maybe use an arrow and set the label to Step #1, Step #2, etc. \n" +
   "Dont label anything over 20 feet away from the camera. \n" +

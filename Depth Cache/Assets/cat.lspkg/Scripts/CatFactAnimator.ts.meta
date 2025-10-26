@@ -1,0 +1,62 @@
+- !<AssetImportMetadata/b91638af-da5a-16da-bf52-21b59fc9d759>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> de954183-5d2a-4dc5-95ba-f54ddcf25976
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> de954183-5d2a-4dc5-95ba-f54ddcf25976
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 5caa12e8-da30-4781-b425-096e8327bf51
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/5caa12e8-da30-4781-b425-096e8327bf51>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 4ba2c55f-4750-4c03-8b1c-63b075de6ebd
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    animationPlayer: false
+    animationStateMachine: false
+    catInteractable: false
+    fetchCatFacts: false
+    hintImage: false
+    thoughtBubbleImage: false
+    thoughtBubbleText: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - thoughtBubbleImage: !<reference.Image> 00000000-0000-0000-0000-000000000000
+      thoughtBubbleText: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      fetchCatFacts: !<MappingBased.AssignableType> 00000000-0000-0000-0000-000000000000
+      catInteractable: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
+      animationPlayer: !<reference.AnimationPlayer> 00000000-0000-0000-0000-000000000000
+      hintImage: !<reference.Image> 00000000-0000-0000-0000-000000000000
+      animationStateMachine: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - // @input Component.Image thoughtBubbleImage
+    - // @input Component.Text thoughtBubbleText
+    - // @input AssignableType fetchCatFacts
+    - // @input AssignableType_1 catInteractable
+    - // @input Component.AnimationPlayer animationPlayer
+    - // @input Component.Image hintImage
+    - // @input Component.ScriptComponent animationStateMachine
