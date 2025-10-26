@@ -28,7 +28,7 @@ export class SceneController extends BaseScriptComponent {
 
   private isRequestRunning = false;
   private lastCaptureTime: number = 0;
-  private readonly CAPTURE_INTERVAL: number = 15; // 30 seconds
+  private readonly CAPTURE_INTERVAL: number = 30; // 30 seconds
 
   onAwake() {
     this.createEvent("OnStartEvent").bind(this.onStart.bind(this));
@@ -53,10 +53,10 @@ export class SceneController extends BaseScriptComponent {
     // Check if 15 seconds have passed since last capture
     const timeSinceLastCapture = currentTime - this.lastCaptureTime;
     if (timeSinceLastCapture >= this.CAPTURE_INTERVAL) {
-      print(`📸 Auto-capturing every 15 seconds... (${timeSinceLastCapture.toFixed(1)}s elapsed)`);
+      print(`📸 Auto-capturing every 30 seconds... (${timeSinceLastCapture.toFixed(1)}s elapsed)`);
       this.captureAndAnalyze();
       this.lastCaptureTime = currentTime;
-      print(`🔄 Timer reset - next capture in 15s`);
+      print(`🔄 Timer reset - next capture in 30s`);
       print(`🔄 DEBUG: lastCaptureTime = ${this.lastCaptureTime}, currentTime = ${currentTime}`);
     }
     
@@ -151,4 +151,3 @@ export class SceneController extends BaseScriptComponent {
     });
   }
 }
-
