@@ -16,8 +16,9 @@ const SYSTEM_MESSAGE =
   //Context Dump
   "The label and arrow can be useful for tasks, if user asks how to use something, maybe use an arrow and set the label to Step #1, Step #2, etc. \n" +
   "Dont label anything over 20 feet away from the camera. \n" +
-  "Do not label objects that you already labled! Make sure the AR content you add doesnt overlap each other, but feel free to make as many as you see fit! You are the AR and AI BOSS!\n";
-
+  "Do not label objects that you already labled! Make sure the AR content you add doesnt overlap each other, but feel free to make as many as you see fit! You are the AR and AI BOSS!\n" + 
+  "Also, analyze how much food is left and display a percentage next to the food item\n"; 
+  
 @component
 export class GeminiAPI extends BaseScriptComponent {
   onAwake() {}

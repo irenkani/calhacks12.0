@@ -32,7 +32,6 @@
     loading: false
     responseUI: false
     showDebugVisuals: false
-    speechUI: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -44,19 +43,17 @@
   DefaultScriptInputs:
     - showDebugVisuals: false
       debugVisualizer: !<MappingBased.AssignableType> 00000000-0000-0000-0000-000000000000
-      speechUI: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
-      gemini: !<MappingBased.AssignableType_2> 00000000-0000-0000-0000-000000000000
-      responseUI: !<MappingBased.AssignableType_3> 00000000-0000-0000-0000-000000000000
-      loading: !<MappingBased.AssignableType_4> 00000000-0000-0000-0000-000000000000
-      depthCache: !<MappingBased.AssignableType_5> 00000000-0000-0000-0000-000000000000
+      gemini: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
+      responseUI: !<MappingBased.AssignableType_2> 00000000-0000-0000-0000-000000000000
+      loading: !<MappingBased.AssignableType_3> 00000000-0000-0000-0000-000000000000
+      depthCache: !<MappingBased.AssignableType_4> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
       {}
   InputLines:
     - '// @input bool showDebugVisuals {"hint":"Show debug visuals in the scene"}'
     - '// @input AssignableType debugVisualizer {"hint":"Visualizes 2D points over the camera frame for debugging"}'
-    - '// @input AssignableType_1 speechUI {"hint":"Handles speech input and ASR"}'
-    - '// @input AssignableType_2 gemini {"hint":"Calls to the Gemini API using Smart Gate"}'
-    - '// @input AssignableType_3 responseUI {"hint":"Displays AI speech output"}'
-    - '// @input AssignableType_4 loading {"hint":"Loading visual"}'
-    - '// @input AssignableType_5 depthCache {"hint":"Caches depth frame and converts pixel positions to world space"}'
+    - '// @input AssignableType_1 gemini {"hint":"Calls to the Gemini API using Smart Gate"}'
+    - '// @input AssignableType_2 responseUI {"hint":"Displays AI speech output"}'
+    - '// @input AssignableType_3 loading {"hint":"Loading visual"}'
+    - '// @input AssignableType_4 depthCache {"hint":"Caches depth frame and converts pixel positions to world space"}'
