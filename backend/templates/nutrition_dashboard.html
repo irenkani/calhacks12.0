@@ -161,18 +161,19 @@
                     <p><strong>${analysis.total_images_analyzed}</strong> meal images processed</p>
                 </div>
                 
-                <div class="metric">
-                    <h3>⏰ Eating Patterns</h3>
-                    <p><strong>Total Meals:</strong> ${analysis.eating_patterns.total_meals}</p>
-                    <p><strong>Average Interval:</strong> ${analysis.eating_patterns.avg_interval_hours} hours between meals</p>
-                    <p><strong>Regular Eating:</strong> ${analysis.eating_patterns.regular_eating ? '✅ Yes - Good routine' : '❌ No - Irregular pattern'}</p>
-                    <p><strong>Average Consumption:</strong> ${analysis.eating_patterns.avg_consumption_percent}% per meal</p>
-                </div>
+                        <div class="metric">
+                            <h3>⏰ Eating Patterns</h3>
+                            <p><strong>Meal Sessions:</strong> ${analysis.eating_patterns.total_meal_sessions} (${analysis.eating_patterns.total_images} images)</p>
+                            <p><strong>Average Interval:</strong> ${analysis.eating_patterns.avg_interval_hours} hours between meal sessions</p>
+                            <p><strong>Regular Eating:</strong> ${analysis.eating_patterns.regular_eating ? '✅ Yes - Good routine' : '❌ No - Irregular pattern'}</p>
+                            <p><strong>Average Consumption:</strong> ${analysis.eating_patterns.avg_consumption_per_session}% per meal session</p>
+                            <p><strong>Note:</strong> ${analysis.eating_patterns.meal_grouping_note}</p>
+                        </div>
                 
                 <div class="metric">
                     <h3>🍎 Nutritional Summary</h3>
                     <p><strong>Total Calories:</strong> ${analysis.nutritional_summary.total_calories}</p>
-                    <p><strong>Average per Meal:</strong> ${analysis.nutritional_summary.avg_calories_per_meal} calories</p>
+                    <p><strong>Average per Meal Session:</strong> ${analysis.nutritional_summary.avg_calories_per_session} calories</p>
                     <p><strong>Most Common Foods:</strong> ${analysis.nutritional_summary.most_common_foods.join(', ')}</p>
                 </div>
                 

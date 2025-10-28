@@ -103,6 +103,7 @@ storage_agent = Agent(
     seed="storage_agent_seed_phrase",
     port=8001,
     endpoint=["http://0.0.0.0:8001/submit"],
+    agentverse="https://agentverse.ai",  # Connect to Agentverse
     mailbox=True
 )
 

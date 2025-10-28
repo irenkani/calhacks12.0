@@ -26,6 +26,7 @@ analysis_agent = Agent(
     seed="eating_disorder_support_seed_phrase",
     port=8000,
     endpoint=["http://0.0.0.0:8000/submit"],
+    agentverse="https://agentverse.ai",  # Connect to Agentverse
     mailbox=True
 )
 

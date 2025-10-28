@@ -39,6 +39,7 @@ analysis_agent = Agent(
     seed="nutrition_analysis_seed_phrase",
     port=8003,
     endpoint=["http://0.0.0.0:8003/submit"],
+    agentverse="https://agentverse.ai",  # Connect to Agentverse
     mailbox=True
 )
 
@@ -231,31 +232,43 @@ def generate_comprehensive_report(analyses, patient_id):
             analysis_timestamp=int(time.time())
         )
     
-    # Analyze eating patterns
-    timestamps = [a['timestamp'] for a in analyses]
-    timestamps.sort()
+    # Group analyses by meal sessions (within 1 hour = same meal)
+    meal_sessions = group_analyses_by_meal_session(analyses)
     
-    # Calculate time intervals between meals
+    # Analyze eating patterns based on meal sessions
+    session_timestamps = [session['timestamp'] for session in meal_sessions]
+    session_timestamps.sort()
+    
+    # Calculate time intervals between meal sessions
     intervals = []
-    for i in range(1, len(timestamps)):
-        interval_hours = (timestamps[i] - timestamps[i-1]) / 3600
+    for i in range(1, len(session_timestamps)):
+        interval_hours = (session_timestamps[i] - session_timestamps[i-1]) / 3600
         intervals.append(interval_hours)
     
     avg_interval = sum(intervals) / len(intervals) if intervals else 0
     
-    # Analyze food consumption patterns
-    total_consumed = sum(a['analysis'].consumed_since_last for a in analyses)
-    avg_consumed = total_consumed / len(analyses)
-    
-    # Collect all food items
+    # Analyze food consumption patterns per meal session
+    total_consumed_per_session = []
+    total_calories_per_session = []
     all_foods = []
-    total_calories = 0
-    for analysis in analyses:
-        for food in analysis['analysis'].food_items:
-            all_foods.append(food.name)
-        total_calories += analysis['analysis'].estimated_calories
     
-    # Generate recommendations
+    for session in meal_sessions:
+        # Sum up consumption from all images in this meal session
+        session_consumed = sum(analysis['analysis'].consumed_since_last for analysis in session['analyses'])
+        session_calories = sum(analysis['analysis'].estimated_calories for analysis in session['analyses'])
+        
+        total_consumed_per_session.append(session_consumed)
+        total_calories_per_session.append(session_calories)
+        
+        # Collect all food items from this session
+        for analysis in session['analyses']:
+            for food in analysis['analysis'].food_items:
+                all_foods.append(food.name)
+    
+    avg_consumed_per_session = sum(total_consumed_per_session) / len(total_consumed_per_session) if total_consumed_per_session else 0
+    total_calories = sum(total_calories_per_session)
+    
+    # Generate recommendations based on meal sessions
     recommendations = []
     
     if avg_interval < 2:
@@ -265,17 +278,17 @@ def generate_comprehensive_report(analyses, patient_id):
     else:
         recommendations.append("✅ Good meal timing - regular eating pattern detected")
     
-    if avg_consumed < 20:
-        recommendations.append("⚠️ Low food consumption - consider increasing portion sizes")
-    elif avg_consumed > 80:
-        recommendations.append("⚠️ High food consumption - consider portion control")
+    if avg_consumed_per_session < 20:
+        recommendations.append("⚠️ Low food consumption per meal - consider increasing portion sizes")
+    elif avg_consumed_per_session > 80:
+        recommendations.append("⚠️ High food consumption per meal - consider portion control")
     else:
-        recommendations.append("✅ Moderate food consumption - good portion control")
+        recommendations.append("✅ Moderate food consumption per meal - good portion control")
     
     # Nutritional recommendations
     food_categories = {}
     for food in all_foods:
-        # Simple categorization (you can enhance this)
+        # Simple categorization
         if any(word in food.lower() for word in ['vegetable', 'salad', 'broccoli', 'carrot']):
             food_categories['vegetables'] = food_categories.get('vegetables', 0) + 1
         elif any(word in food.lower() for word in ['meat', 'chicken', 'beef', 'fish']):
@@ -283,28 +296,61 @@ def generate_comprehensive_report(analyses, patient_id):
         elif any(word in food.lower() for word in ['bread', 'pasta', 'rice', 'potato']):
             food_categories['carbs'] = food_categories.get('carbs', 0) + 1
     
-    if food_categories.get('vegetables', 0) < len(analyses) * 0.3:
+    if food_categories.get('vegetables', 0) < len(meal_sessions) * 0.3:
         recommendations.append("🥬 Consider increasing vegetable intake")
     
     return AnalysisResult(
         patient_id=patient_id,
         total_images_analyzed=len(analyses),
         eating_patterns={
-            "total_meals": len(analyses),
+            "total_meal_sessions": len(meal_sessions),
+            "total_images": len(analyses),
             "avg_interval_hours": round(avg_interval, 2),
             "regular_eating": avg_interval >= 2 and avg_interval <= 6,
-            "avg_consumption_percent": round(avg_consumed, 2)
+            "avg_consumption_per_session": round(avg_consumed_per_session, 2),
+            "meal_grouping_note": "Images within 1 hour grouped as same meal"
         },
         nutritional_summary={
             "total_calories": total_calories,
-            "avg_calories_per_meal": round(total_calories / len(analyses), 2),
+            "avg_calories_per_session": round(total_calories / len(meal_sessions), 2) if meal_sessions else 0,
             "food_categories": food_categories,
             "most_common_foods": list(set(all_foods))[:5]
         },
         recommendations=recommendations,
-        confidence_score=0.85,  # Based on successful analyses
+        confidence_score=0.85,
         analysis_timestamp=int(time.time())
     )
+
+def group_analyses_by_meal_session(analyses):
+    """Group analyses by meal sessions (within 1 hour = same meal)"""
+    if not analyses:
+        return []
+    
+    # Sort by timestamp
+    sorted_analyses = sorted(analyses, key=lambda x: x['timestamp'])
+    
+    meal_sessions = []
+    current_session = {
+        'timestamp': sorted_analyses[0]['timestamp'],
+        'analyses': [sorted_analyses[0]]
+    }
+    
+    for analysis in sorted_analyses[1:]:
+        time_diff_hours = (analysis['timestamp'] - current_session['timestamp']) / 3600
+        
+        if time_diff_hours <= 1.0:  # Within 1 hour = same meal
+            current_session['analyses'].append(analysis)
+        else:  # New meal session
+            meal_sessions.append(current_session)
+            current_session = {
+                'timestamp': analysis['timestamp'],
+                'analyses': [analysis]
+            }
+    
+    # Add the last session
+    meal_sessions.append(current_session)
+    
+    return meal_sessions
 
 if __name__ == "__main__":
     print("🚀 Starting Nutrition Analysis Agent...")
